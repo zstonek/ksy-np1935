@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dynamic D-Day, Clock & Weather</title>
+    <title>Dynamic D-Day, Clock & 5-Day Weather Forecast</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet" />
     <style>
         /* 기본 (라이트 모드 또는 시스템 설정 없을 시) */
@@ -57,7 +57,7 @@
             text-align: center;
             cursor: default;
             user-select: none;
-            flex-shrink: 0; /* 내용이 줄어들어도 박스 자체는 최소 크기 유지 */
+            flex-shrink: 0;
         }
 
         .glass-box:hover {
@@ -74,29 +74,12 @@
             max-width: 90%;
         }
 
-        /* 날씨 스타일 */
-        .glass-box.weather-display {
-            font-size: 1.4rem;
-            padding: 15px 30px;
-            min-width: 280px;
-            max-width: 90%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .weather-icon {
-            width: 50px;
-            height: 50px;
-        }
-
         /* 디데이 박스 스타일 (기본) */
         .glass-box.dday-display {
             font-size: 1.6rem;
             padding: 12px 25px;
             min-width: 150px;
-            max-width: fit-content; /* 내용에 맞게 너비 조절 */
+            max-width: fit-content;
             flex-grow: 0;
         }
 
@@ -104,39 +87,111 @@
         .dday-container {
             display: flex;
             flex-direction: row; /* 기본: 가로 나열 */
-            flex-wrap: wrap; /* 넘치면 줄바꿈 */
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 10px; /* 내부 요소 간 간격 */
+            gap: 10px;
             width: 100%;
-            max-width: 450px; /* 전체 컨테이너 최대 너비 */
+            max-width: 450px;
         }
 
+        /* 날씨 예보 컨테이너 */
+        .weather-forecast-container {
+            display: flex;
+            flex-direction: column; /* 기본: 세로 나열 */
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            gap: 10px;
+        }
+
+        /* 각 날씨 예보 아이템 */
+        .weather-forecast-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            width: 90%;
+            max-width: 550px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-color);
+            gap: 10px;
+        }
+
+        .forecast-day {
+            flex-basis: 30%;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .forecast-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+        .forecast-temp {
+            flex-basis: 40%;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .forecast-temp .min-temp {
+            font-weight: normal;
+            opacity: 0.8;
+            margin-right: 5px;
+        }
 
         /* 가로 넓이가 넓을 때 (데스크톱, 넓은 위젯) */
         @media (min-width: 601px) {
             body {
-                gap: 20px; /* 요소 간 간격 넓힘 */
+                gap: 20px;
             }
             .glass-box.time-display {
-                font-size: 4rem; /* 시계 더 크게 */
+                font-size: 4rem;
                 padding: 25px 50px;
             }
-            .glass-box.weather-display {
-                font-size: 1.6rem; /* 날씨 더 크게 */
-                padding: 20px 40px;
-            }
-            .weather-icon {
-                width: 60px;
-                height: 60px;
-            }
-
             .dday-container {
-                gap: 20px; /* 디데이 박스 간 간격 */
-                max-width: 600px; /* 디데이 컨테이너 최대 너비 */
+                gap: 20px;
+                max-width: 600px;
             }
             .glass-box.dday-display {
-                font-size: 1.8rem; /* 디데이 글씨 크게 */
+                font-size: 1.8rem;
                 padding: 15px 30px;
+            }
+
+            .weather-forecast-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                max-width: none;
+                justify-content: center;
+                gap: 15px;
+            }
+            .weather-forecast-item {
+                flex-basis: calc(33.33% - 10px); /* 3개씩 한 줄에 (gap 고려) */
+                max-width: 180px;
+                flex-direction: column;
+                justify-content: center;
+                padding: 15px 10px;
+                font-size: 1.2rem;
+            }
+            .forecast-day {
+                text-align: center;
+                flex-basis: auto;
+                width: 100%;
+            }
+            .forecast-icon {
+                width: 50px;
+                height: 50px;
+            }
+            .forecast-temp {
+                text-align: center;
+                flex-basis: auto;
+                width: 100%;
             }
         }
 
@@ -150,26 +205,35 @@
                 font-size: 2.5rem;
                 padding: 15px 30px;
             }
-            .glass-box.weather-display {
-                font-size: 1.2rem;
-                padding: 10px 25px;
-            }
-            .weather-icon {
-                width: 40px;
-                height: 40px;
-            }
             .dday-container {
-                flex-direction: column; /* 디데이들을 세로로 쌓음 */
+                flex-direction: column;
                 gap: 10px;
                 width: 100%;
-                max-width: 300px; /* 모바일에서 디데이 컨테이너 최대 너비 */
+                max-width: 300px;
             }
             .glass-box.dday-display {
                 font-size: 1.3rem;
                 padding: 10px 20px;
                 min-width: auto;
-                width: 90%; /* 모바일에서 화면 너비에 맞게 */
+                width: 90%;
                 max-width: 250px;
+            }
+            .weather-forecast-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .weather-forecast-item {
+                font-size: 1rem;
+                padding: 8px 15px;
+                width: 95%;
+                max-width: 300px;
+            }
+            .forecast-icon {
+                width: 35px;
+                height: 35px;
+            }
+            .forecast-temp .min-temp {
+                font-size: 0.9em;
             }
         }
     </style>
@@ -182,21 +246,27 @@
         <div class="glass-box dday-display" id="daysPassed2"></div>
     </div>
 
-    <div class="glass-box weather-display" id="weatherInfo">날씨 로딩 중...</div>
+    <div class="weather-forecast-container" id="weatherForecast">
+        <div class="glass-box">날씨 예보 로딩 중...</div>
+    </div>
 
     <script>
         // --- 여기에 OpenWeatherMap API 키를 입력하세요 (필수!) ---
-        const OPENWEATHER_API_KEY = '5f9417ce38986ea5ee8a73cc201d3e0f'; // 발급받은 API 키를 여기에 붙여넣기
+        // 이 키는 One Call API 3.0이 아닌 5 day / 3 hour forecast (v2.5)에 사용되는 키여야 합니다.
+        const OPENWEATHER_API_KEY = '5f9417ce38986ea5ee8a73cc201d3e0f';
 
         // --- 디데이 1 시작 날짜를 지정하세요 (YYYY-MM-DD 형식) ---
-        const userStartDate1 = '2025-02-01'; // 예시: 2025년 1월 1일
+        const userStartDate1 = '2025-02-01';
 
         // --- 디데이 2 시작 날짜를 지정하세요 (YYYY-MM-DD 형식) ---
-        const userStartDate2 = '2025-04-05'; // 예시: 2025년 6월 18일
+        const userStartDate2 = '2025-04-05'; // Today's date for reference: 2025-06-18
 
         // 천안의 위도와 경도
         const CHEONAN_LAT = 36.8143;
         const CHEONAN_LON = 127.1193;
+
+        // 요일 배열 (한국어)
+        const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
         // 날짜 파싱 및 시간 초기화 함수
         function getParsedDate(dateString) {
@@ -228,68 +298,55 @@
             document.getElementById('currentTime').textContent = `${hours}:${minutes}:${seconds}`;
         }
 
-        // 날씨 정보 가져오기 및 업데이트
-        async function fetchWeather() {
-            // API 키가 설정되지 않았다면 함수 종료
+        // 5일간의 날씨 예보 가져오기 및 업데이트
+        async function fetchWeatherForecast() {
+            const weatherForecastDiv = document.getElementById('weatherForecast');
             if (OPENWEATHER_API_KEY === 'YOUR_OPENWEATHERMAP_API_KEY' || !OPENWEATHER_API_KEY) {
-                document.getElementById('weatherInfo').innerHTML = '<span style="color: red;">API 키를 설정해주세요.</span>';
+                weatherForecastDiv.innerHTML = '<div class="glass-box" style="color: red;">API 키를 설정해주세요.</div>';
                 console.error('OpenWeatherMap API Key is not set. Please replace "YOUR_OPENWEATHERMAP_API_KEY" with your actual key.');
                 return;
             }
 
-            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${CHEONAN_LAT}&lon=${CHEONAN_LON}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=kr`;
+            // 5 day / 3 hour forecast API (v2.5) 사용
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${CHEONAN_LAT}&lon=${CHEONAN_LON}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=kr`;
 
             try {
                 const response = await fetch(weatherUrl);
-                // 응답이 성공적인지 확인 (HTTP 상태 코드 200-299)
                 if (!response.ok) {
                     const errorData = await response.json();
                     console.error('API 응답 오류:', response.status, errorData);
-                    document.getElementById('weatherInfo').innerHTML = `<span style="color: red;">날씨 오류: ${errorData.message || response.statusText}</span>`;
+                    weatherForecastDiv.innerHTML = `<div class="glass-box" style="color: red;">날씨 오류: ${errorData.message || response.statusText}</div>`;
                     return;
                 }
 
                 const data = await response.json();
 
-                if (data.main && data.weather && data.name) { // 도시 이름도 확인
-                    const temperature = Math.round(data.main.temp);
-                    const description = data.weather[0].description;
-                    const iconCode = data.weather[0].icon;
-                    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-                    const cityName = data.name;
+                if (data.list && data.list.length > 0) {
+                    let forecastHtml = '';
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // 오늘 날짜를 기준으로 설정
 
-                    const weatherInfoDiv = document.getElementById('weatherInfo');
-                    weatherInfoDiv.innerHTML = `
-                        <img src="${iconUrl}" alt="${description}" class="weather-icon">
-                        <span>${cityName}, ${temperature}°C, ${description}</span>
-                    `;
-                } else {
-                    document.getElementById('weatherInfo').innerHTML = '<span style="color: red;">날씨 정보가 불완전합니다.</span>';
-                    console.warn('Weather data incomplete:', data);
-                }
-            } catch (error) {
-                console.error('날씨 정보를 가져오는 데 실패했습니다:', error);
-                document.getElementById('weatherInfo').innerHTML = '<span style="color: red;">날씨 정보를 가져올 수 없습니다. (네트워크/API 오류)</span>';
-            }
-        }
+                    // 각 날짜별 최저/최고 온도와 날씨 정보를 저장할 객체
+                    const dailyForecasts = {};
 
-        // 초기 로드 시 모든 카운터 및 시계, 날씨 업데이트
-        updateDaysPassed(startDate1, 'daysPassed1');
-        updateDaysPassed(startDate2, 'daysPassed2');
-        updateTime();
-        fetchWeather();
+                    data.list.forEach(item => {
+                        const date = new Date(item.dt * 1000);
+                        date.setHours(0, 0, 0, 0); // 각 예보 항목의 날짜 부분을 자정으로 설정하여 비교 용이하게
 
-        // 매일 자정에 디데이 업데이트 (24시간 주기)
-        setInterval(() => {
-            updateDaysPassed(startDate1, 'daysPassed1');
-            updateDaysPassed(startDate2, 'daysPassed2');
-        }, 86400000);
+                        // 오늘로부터 5일 이내의 예보만 포함 (오늘 포함 5일)
+                        const diffDays = Math.floor((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                        if (diffDays >= 0 && diffDays < 5) { // 0: 오늘, 1: 내일, ..., 4: 5일 뒤
+                            const dateKey = date.toISOString().slice(0, 10); // YYYY-MM-DD 형식의 키
 
-        // 매 초마다 시간 업데이트
-        setInterval(updateTime, 1000);
-
-        // 날씨 정보는 10분마다 업데이트
-        setInterval(fetchWeather, 10 * 60 * 1000);
-    </script>
-</body>
-</html>
+                            if (!dailyForecasts[dateKey]) {
+                                dailyForecasts[dateKey] = {
+                                    minTemp: Infinity,
+                                    maxTemp: -Infinity,
+                                    icon: item.weather[0].icon,
+                                    description: item.weather[0].description,
+                                    date: date
+                                };
+                            }
+                            // 해당 날짜의 최저/최고 온도 업데이트
+                            dailyForecasts[dateKey].minTemp = Math.min(dailyForecasts[dateKey].minTemp, item.main.temp_min);
+                            dailyForecasts[dateKey].maxTemp = Math.max(dailyForecasts[dateKey].maxTemp, item.
