@@ -3,13 +3,23 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Minimal Glass Counter with Clock</title>
+    <title>Dynamic Glass Counter with Clock</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet" />
     <style>
+        /* 기본 (라이트 모드 또는 미설정 시) */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.05); /* 더 투명하게 */
-            --glass-border: rgba(255, 255, 255, 0.1); /* 테두리도 옅게 */
-            --text-color: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.2); /* 라이트 모드용 배경 투명도 증가 */
+            --glass-border: rgba(255, 255, 255, 0.3); /* 라이트 모드용 테두리 투명도 증가 */
+            --text-color: #333333; /* 라이트 모드 텍스트 색상 (어둡게) */
+        }
+
+        /* 다크 모드 설정 시 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --glass-bg: rgba(255, 255, 255, 0.05); /* 다크 모드용 배경 (더 투명하게) */
+                --glass-border: rgba(255, 255, 255, 0.1); /* 다크 모드용 테두리 (더 투명하게) */
+                --text-color: #ffffff; /* 다크 모드 텍스트 색상 (밝게) */
+            }
         }
 
         * {
@@ -19,51 +29,52 @@
         }
 
         body {
-            background: transparent;
+            background: transparent; /* Notion 배경을 사용하도록 투명하게 유지 */
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Montserrat', sans-serif;
-            color: var(--text-color);
+            color: var(--text-color); /* 다크/라이트 모드에 따라 변경 */
             padding: 15px;
             flex-direction: column; /* 카운터와 시계를 세로로 배치 */
             gap: 15px; /* 카운터와 시계 사이 간격 */
+            transition: color 0.3s ease; /* 텍스트 색상 전환 부드럽게 */
         }
 
         .glass-container {
-            display: flex; /* 날짜와 시간을 가로로 정렬 */
-            flex-direction: column; /* 작은 화면에서는 세로로 쌓이도록 */
-            gap: 10px; /* 내부 요소 간 간격 */
+            display: flex;
+            flex-direction: column; /* 기본적으로 세로로 쌓이도록 (모바일 우선) */
+            gap: 10px;
             align-items: center;
             justify-content: center;
-            width: 100%; /* 너비는 100%로 설정 */
-            max-width: 400px; /* 최대 너비 설정 */
+            width: 100%;
+            max-width: 400px;
         }
 
         .glass-box {
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+            background: var(--glass-bg); /* 다크/라이트 모드에 따라 변경 */
+            border: 1px solid var(--glass-border); /* 다크/라이트 모드에 따라 변경 */
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             padding: 15px 50px;
             font-size: 2rem;
             font-weight: 700;
-            color: var(--text-color);
+            color: var(--text-color); /* 다크/라이트 모드에 따라 변경 */
             letter-spacing: 1px;
-            transition: opacity 0.2s ease;
+            transition: background 0.3s ease, border 0.3s ease, color 0.3s ease, opacity 0.2s ease; /* 색상 전환 부드럽게 */
             min-width: 250px;
             text-align: center;
             cursor: default;
             user-select: none;
-            flex-grow: 1; /* 컨테이너 내에서 공간을 채우도록 */
+            flex-grow: 1;
         }
 
         .glass-box.time-display {
-            font-size: 1.8rem; /* 시간 표시 폰트 크기 살짝 작게 */
-            padding: 12px 40px; /* 시간 표시 패딩 조절 */
+            font-size: 1.8rem;
+            padding: 12px 40px;
             letter-spacing: 0.5px;
         }
 
@@ -71,12 +82,26 @@
             opacity: 0.8;
         }
 
-        @media (max-width: 600px) {
+        @media (min-width: 601px) { /* 데스크톱에서는 가로로 배치 */
+            .glass-container {
+                flex-direction: row;
+                gap: 20px; /* 데스크톱에서 요소 간 간격 넓게 */
+            }
+            .glass-box {
+                min-width: 180px; /* 데스크톱에서 너비 조절 */
+                padding: 15px 30px;
+            }
+            .glass-box.time-display {
+                 padding: 12px 30px;
+            }
+        }
+
+        @media (max-width: 600px) { /* 모바일에서는 세로 배치 유지 및 폰트/패딩 조절 */
             body {
                 gap: 10px;
             }
             .glass-container {
-                flex-direction: column; /* 모바일에서는 항상 세로로 */
+                flex-direction: column;
                 gap: 10px;
             }
             .glass-box {
@@ -101,16 +126,16 @@
         // --- 여기에 시작 날짜를 지정하세요 (YYYY-MM-DD 형식) ---
         const userStartDate = '2025-02-01'; // 예시: 2025년 2월 1일
 
-        // 날짜 파싱 및 시간 초기화
-        const startDate = new Date(userStartDate);
-        startDate.setHours(0, 0, 0, 0); // 날짜의 시간을 자정으로 설정
+        // 날짜 파싱 및 시간 초기화 (오류 방지를 위해 Date.parse 사용)
+        const startDate = new Date(Date.parse(userStartDate));
+        startDate.setHours(0, 0, 0, 0); // 날짜의 시간을 자정으로 설정하여 일수 계산의 정확성 확보
 
         function updateDaysPassed() {
             const now = new Date();
             now.setHours(0, 0, 0, 0); // 현재 날짜의 시간을 자정으로 설정
 
             const diff = now - startDate;
-            // 만약 시작 날짜가 미래라면 0일로 표시
+            // 시작 날짜가 미래라면 0일로 표시, 아니라면 일수 계산
             const daysPassed = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
 
             document.getElementById('daysPassed').textContent = '+' + daysPassed;
@@ -118,6 +143,7 @@
 
         function updateTime() {
             const now = new Date();
+            // 각 부분을 두 자리 숫자로 맞추기 (예: 9 -> 09)
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
@@ -128,9 +154,10 @@
         updateDaysPassed();
         updateTime();
 
-        // 매일 자정에 날짜 업데이트 (정확한 24시간 간격 유지)
+        // 날짜는 매일 자정에 업데이트 (24시간 주기)
         setInterval(updateDaysPassed, 86400000);
-        // 매 초마다 시간 업데이트
+
+        // 시간은 매 초마다 업데이트
         setInterval(updateTime, 1000);
     </script>
 </body>
