@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fixed Multi-D-Day Glass Counter with Clock</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet" />
+    <title>Dynamic D-Day, Clock & Weather</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet" />
     <style>
         /* 기본 (라이트 모드 또는 시스템 설정 없을 시) */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.4); /* 라이트 모드용 배경: 투명도 더 높임 */
-            --glass-border: rgba(255, 255, 255, 0.6); /* 라이트 모드용 테두리: 투명도 더 높임 */
-            --text-color: #000000; /* 라이트 모드 텍스트 색상: 완전한 검은색 */
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-color: #000000;
         }
 
         /* 다크 모드 설정 시 */
         @media (prefers-color-scheme: dark) {
             :root {
-                --glass-bg: rgba(255, 255, 255, 0.08); /* 다크 모드용 배경 */
-                --glass-border: rgba(255, 255, 255, 0.15); /* 다크 모드용 테두리 */
-                --text-color: #ffffff; /* 다크 모드 텍스트 색상: 흰색 */
+                --glass-bg: rgba(255, 255, 255, 0.08);
+                --glass-border: rgba(255, 255, 255, 0.15);
+                --text-color: #ffffff;
             }
         }
 
@@ -29,128 +29,175 @@
         }
 
         body {
-            background: transparent; /* Notion 배경을 사용하도록 투명하게 유지 */
-            height: 100vh;
+            background: transparent;
+            height: 100vh; /* 부모 컨테이너에 높이 설정 (Notion 임베드 블록 높이) */
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Montserrat', sans-serif;
-            color: var(--text-color); /* 다크/라이트 모드에 따라 변경 */
+            color: var(--text-color);
             padding: 15px;
-            flex-direction: column; /* 컨테이너들을 세로로 배치 (모바일 우선) */
-            gap: 15px; /* 컨테이너들 사이 간격 */
-            transition: color 0.3s ease, background 0.3s ease; /* 색상 전환 부드럽게 */
+            flex-direction: column; /* 기본은 세로 정렬 */
+            gap: 15px;
+            transition: color 0.3s ease, background 0.3s ease;
         }
 
-        .glass-container {
-            display: flex;
-            flex-direction: column; /* 기본: 모바일에서는 세로로 쌓임 */
-            flex-wrap: wrap; /* 요소가 넘치면 다음 줄로 */
-            gap: 10px; /* 내부 요소 간 간격 */
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            max-width: 450px; /* 전체 컨테이너 최대 너비 */
-        }
-
+        /* 모든 유리 박스의 공통 스타일 */
         .glass-box {
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            background: var(--glass-bg); /* 다크/라이트 모드에 따라 변경 */
-            border: 1px solid var(--glass-border); /* 다크/라이트 모드에 따라 변경 */
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            padding: 15px 40px; /* 패딩 조정 */
-            font-size: 1.8rem; /* 폰트 크기 조정 */
             font-weight: 700;
-            color: var(--text-color); /* 다크/라이트 모드에 따라 변경 */
+            color: var(--text-color);
             letter-spacing: 1px;
-            transition: background 0.3s ease, border 0.3s ease, color 0.3s ease, opacity 0.2s ease; /* 색상 전환 부드럽게 */
-            min-width: 200px; /* 최소 너비 */
+            transition: background 0.3s ease, border 0.3s ease, color 0.3s ease, opacity 0.2s ease;
             text-align: center;
             cursor: default;
             user-select: none;
-            flex-grow: 1; /* 컨테이너 내에서 공간을 채우도록 */
-            /* max-width: calc(50% - 10px); 모바일에서는 사용 안 함 */
-        }
-
-        .glass-box.time-display {
-            font-size: 1.6rem; /* 시간 표시 폰트 크기 조정 */
-            padding: 12px 35px; /* 시간 표시 패딩 조정 */
-            letter-spacing: 0.5px;
+            flex-shrink: 0; /* 내용이 줄어들어도 박스 자체는 최소 크기 유지 */
         }
 
         .glass-box:hover {
             opacity: 0.8;
         }
 
-        /* 데스크톱 (601px 이상): 가로로 배치 */
+        /* 시계 스타일 */
+        .glass-box.time-display {
+            font-size: 3.5rem;
+            font-weight: 900;
+            padding: 20px 40px;
+            letter-spacing: 2px;
+            min-width: 280px;
+            max-width: 90%;
+        }
+
+        /* 날씨 스타일 */
+        .glass-box.weather-display {
+            font-size: 1.4rem;
+            padding: 15px 30px;
+            min-width: 280px;
+            max-width: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .weather-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        /* 디데이 박스 스타일 (기본) */
+        .glass-box.dday-display {
+            font-size: 1.6rem;
+            padding: 12px 25px;
+            min-width: 150px;
+            max-width: fit-content; /* 내용에 맞게 너비 조절 */
+            flex-grow: 0;
+        }
+
+        /* 가로 넓이가 넓을 때 (데스크톱, 넓은 위젯) */
         @media (min-width: 601px) {
-            .glass-container {
-                flex-direction: row; /* 가로로 배치 */
-                flex-wrap: wrap; /* 요소들이 한 줄에 안 들어가면 다음 줄로 */
-                justify-content: center;
-                gap: 20px; /* 요소 간 간격 넓게 */
-            }
-            .glass-box {
-                flex-basis: auto; /* 내용에 따라 너비 자동 조절 */
-                min-width: 180px; /* 데스크톱 최소 너비 */
-                max-width: calc(33.33% - 14px); /* 3개 요소가 한 줄에 나오도록 (gap 고려) */
-                padding: 15px 25px; /* 패딩 조정 */
-                font-size: 1.6rem;
+            body {
+                flex-direction: column; /* 여전히 세로 정렬이 기준 */
+                gap: 20px; /* 요소 간 간격 넓힘 */
             }
             .glass-box.time-display {
-                font-size: 1.4rem;
-                padding: 12px 25px;
+                margin-bottom: 0; /* 아래 여백 제거 (전체 gap으로 조절) */
+                font-size: 4rem; /* 시계 더 크게 */
+                padding: 25px 50px;
+            }
+            .glass-box.weather-display {
+                margin-bottom: 0; /* 아래 여백 제거 */
+                font-size: 1.8rem; /* 날씨 더 크게 */
+                padding: 20px 40px;
+            }
+            .weather-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            /* 디데이들을 위한 별도의 컨테이너 */
+            .dday-container {
+                display: flex;
+                flex-direction: row; /* 디데이들만 가로로 나열 */
+                flex-wrap: wrap; /* 넘치면 줄바꿈 */
+                justify-content: center;
+                gap: 20px; /* 디데이 박스 간 간격 */
+                width: 100%;
+                max-width: 600px; /* 디데이 컨테이너 최대 너비 */
+            }
+            .glass-box.dday-display {
+                font-size: 2rem; /* 디데이 글씨 크게 */
+                padding: 15px 30px;
             }
         }
 
-        /* 모바일 (600px 이하): 세로로 배치 */
+        /* 세로로 길거나 가로로 좁을 때 (모바일, 좁은 위젯) */
         @media (max-width: 600px) {
             body {
                 gap: 10px;
-            }
-            .glass-container {
-                flex-direction: column; /* 모바일에서는 항상 세로로 */
-                gap: 10px;
-            }
-            .glass-box {
-                font-size: 1.3rem; /* 모바일 폰트 크기 조정 */
-                padding: 10px 25px; /* 모바일 패딩 조정 */
-                min-width: auto; /* 자동으로 너비 조절 */
-                width: 90%; /* 모바일에서 화면 너비에 맞게 */
-                max-width: 300px; /* 너무 커지지 않도록 최대 너비 설정 */
+                padding: 10px;
             }
             .glass-box.time-display {
-                font-size: 1.1rem; /* 모바일 시간 폰트 크기 조정 */
-                padding: 8px 20px;
+                font-size: 2.5rem;
+                padding: 15px 30px;
+            }
+            .glass-box.weather-display {
+                font-size: 1.2rem;
+                padding: 10px 25px;
+            }
+            .weather-icon {
+                width: 40px;
+                height: 40px;
+            }
+            .dday-container {
+                flex-direction: column; /* 디데이들을 세로로 쌓음 */
+                gap: 10px;
+                width: 100%;
+                max-width: 300px; /* 모바일에서 디데이 컨테이너 최대 너비 */
+            }
+            .glass-box.dday-display {
+                font-size: 1.3rem;
+                padding: 10px 20px;
+                width: 90%; /* 모바일에서 화면 너비에 맞게 */
+                max-width: 250px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="glass-container">
-        <div class="glass-box" id="daysPassed1"></div>
-        <div class="glass-box" id="daysPassed2"></div>
-        <div class="glass-box time-display" id="currentTime"></div>
+    <div class="glass-box time-display" id="currentTime"></div>
+
+    <div class="glass-box weather-display" id="weatherInfo">날씨 로딩 중...</div>
+
+    <div class="dday-container">
+        <div class="glass-box dday-display" id="daysPassed1"></div>
+        <div class="glass-box dday-display" id="daysPassed2"></div>
     </div>
 
     <script>
+        // --- 여기에 OpenWeatherMap API 키를 입력하세요 (필수!) ---
+        const OPENWEATHER_API_KEY = '5f9417ce38986ea5ee8a73cc201d3e0f'; // 발급받은 API 키를 여기에 붙여넣기
+
         // --- 디데이 1 시작 날짜를 지정하세요 (YYYY-MM-DD 형식) ---
         const userStartDate1 = '2025-02-01'; // 예시: 2025년 1월 1일
 
         // --- 디데이 2 시작 날짜를 지정하세요 (YYYY-MM-DD 형식) ---
-        const userStartDate2 = '2025-04-05'; // 예시: 2025년 6월 18일 (오늘 날짜)
+        const userStartDate2 = '2025-04-05'; // 예시: 2025년 6월 18일
+
+        // 천안의 위도와 경도
+        const CHEONAN_LAT = 36.8143;
+        const CHEONAN_LON = 127.1193;
 
         // 날짜 파싱 및 시간 초기화 함수
         function getParsedDate(dateString) {
-            // new Date() 생성자에 YYYY-MM-DD 형식을 직접 넣으면 브라우저별로 파싱 문제가 있을 수 있어
-            // Date.parse()를 사용하거나, 'YYYY/MM/DD' 또는 'YYYY-MM-DDTHH:MM:SS' 같은 표준 형식 사용 권장
-            // 여기서는 'YYYY-MM-DD' 형식은 대부분 잘 동작하므로 그대로 유지하되,
-            // 더 안정성을 위해 날짜 문자열을 직접 파싱하지 않고 new Date()에 바로 넣었습니다.
-            // 필요시 (예: 구형 브라우저 호환성) Date.parse()를 다시 고려할 수 있습니다.
             const date = new Date(dateString);
-            date.setHours(0, 0, 0, 0); // 날짜의 시간을 자정으로 설정
+            date.setHours(0, 0, 0, 0);
             return date;
         }
 
@@ -160,9 +207,9 @@
         // 특정 디데이 카운터 업데이트 함수
         function updateDaysPassed(startDate, elementId) {
             const now = new Date();
-            now.setHours(0, 0, 0, 0); // 현재 날짜의 시간을 자정으로 설정
+            now.setHours(0, 0, 0, 0);
 
-            const diff = now.getTime() - startDate.getTime(); // getTime()을 사용하여 밀리초 값 비교
+            const diff = now.getTime() - startDate.getTime();
             const daysPassed = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
 
             document.getElementById(elementId).textContent = '+' + daysPassed;
@@ -177,10 +224,47 @@
             document.getElementById('currentTime').textContent = `${hours}:${minutes}:${seconds}`;
         }
 
-        // 초기 로드 시 모든 카운터 및 시계 업데이트
+        // 날씨 정보 가져오기 및 업데이트
+        async function fetchWeather() {
+            // API 키가 설정되지 않았다면 함수 종료
+            if (OPENWEATHER_API_KEY === 'YOUR_OPENWEATHERMAP_API_KEY' || !OPENWEATHER_API_KEY) {
+                document.getElementById('weatherInfo').textContent = 'API 키를 설정해주세요.';
+                console.error('OpenWeatherMap API Key is not set. Please replace "YOUR_OPENWEATHERMAP_API_KEY" with your actual key.');
+                return;
+            }
+
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${CHEONAN_LAT}&lon=${CHEONAN_LON}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=kr`;
+
+            try {
+                const response = await fetch(weatherUrl);
+                const data = await response.json();
+
+                if (data.main && data.weather) {
+                    const temperature = Math.round(data.main.temp);
+                    const description = data.weather[0].description;
+                    const iconCode = data.weather[0].icon;
+                    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+                    const weatherInfoDiv = document.getElementById('weatherInfo');
+                    weatherInfoDiv.innerHTML = `
+                        <img src="${iconUrl}" alt="${description}" class="weather-icon">
+                        <span>${temperature}°C, ${description}</span>
+                    `;
+                } else {
+                    document.getElementById('weatherInfo').textContent = '날씨 정보 없음';
+                    console.warn('Weather data incomplete:', data);
+                }
+            } catch (error) {
+                console.error('날씨 정보를 가져오는 데 실패했습니다:', error);
+                document.getElementById('weatherInfo').textContent = '날씨 정보를 가져올 수 없습니다.';
+            }
+        }
+
+        // 초기 로드 시 모든 카운터 및 시계, 날씨 업데이트
         updateDaysPassed(startDate1, 'daysPassed1');
         updateDaysPassed(startDate2, 'daysPassed2');
         updateTime();
+        fetchWeather();
 
         // 매일 자정에 디데이 업데이트 (24시간 주기)
         setInterval(() => {
@@ -190,6 +274,9 @@
 
         // 매 초마다 시간 업데이트
         setInterval(updateTime, 1000);
+
+        // 날씨 정보는 10분마다 업데이트
+        setInterval(fetchWeather, 10 * 60 * 1000);
     </script>
 </body>
 </html>
