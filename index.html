@@ -30,7 +30,7 @@
 
         body {
             background: transparent;
-            height: 100vh; /* 부모 컨테이너에 높이 설정 (Notion 임베드 블록 높이) */
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -100,20 +100,29 @@
             flex-grow: 0;
         }
 
+        /* 디데이들을 위한 컨테이너 */
+        .dday-container {
+            display: flex;
+            flex-direction: row; /* 기본: 가로 나열 */
+            flex-wrap: wrap; /* 넘치면 줄바꿈 */
+            justify-content: center;
+            gap: 10px; /* 내부 요소 간 간격 */
+            width: 100%;
+            max-width: 450px; /* 전체 컨테이너 최대 너비 */
+        }
+
+
         /* 가로 넓이가 넓을 때 (데스크톱, 넓은 위젯) */
         @media (min-width: 601px) {
             body {
-                flex-direction: column; /* 여전히 세로 정렬이 기준 */
                 gap: 20px; /* 요소 간 간격 넓힘 */
             }
             .glass-box.time-display {
-                margin-bottom: 0; /* 아래 여백 제거 (전체 gap으로 조절) */
                 font-size: 4rem; /* 시계 더 크게 */
                 padding: 25px 50px;
             }
             .glass-box.weather-display {
-                margin-bottom: 0; /* 아래 여백 제거 */
-                font-size: 1.8rem; /* 날씨 더 크게 */
+                font-size: 1.6rem; /* 날씨 더 크게 */
                 padding: 20px 40px;
             }
             .weather-icon {
@@ -121,18 +130,12 @@
                 height: 60px;
             }
 
-            /* 디데이들을 위한 별도의 컨테이너 */
             .dday-container {
-                display: flex;
-                flex-direction: row; /* 디데이들만 가로로 나열 */
-                flex-wrap: wrap; /* 넘치면 줄바꿈 */
-                justify-content: center;
                 gap: 20px; /* 디데이 박스 간 간격 */
-                width: 100%;
                 max-width: 600px; /* 디데이 컨테이너 최대 너비 */
             }
             .glass-box.dday-display {
-                font-size: 2rem; /* 디데이 글씨 크게 */
+                font-size: 1.8rem; /* 디데이 글씨 크게 */
                 padding: 15px 30px;
             }
         }
@@ -164,6 +167,7 @@
             .glass-box.dday-display {
                 font-size: 1.3rem;
                 padding: 10px 20px;
+                min-width: auto;
                 width: 90%; /* 모바일에서 화면 너비에 맞게 */
                 max-width: 250px;
             }
@@ -173,12 +177,12 @@
 <body>
     <div class="glass-box time-display" id="currentTime"></div>
 
-    <div class="glass-box weather-display" id="weatherInfo">날씨 로딩 중...</div>
-
     <div class="dday-container">
         <div class="glass-box dday-display" id="daysPassed1"></div>
         <div class="glass-box dday-display" id="daysPassed2"></div>
     </div>
+
+    <div class="glass-box weather-display" id="weatherInfo">날씨 로딩 중...</div>
 
     <script>
         // --- 여기에 OpenWeatherMap API 키를 입력하세요 (필수!) ---
@@ -228,7 +232,7 @@
         async function fetchWeather() {
             // API 키가 설정되지 않았다면 함수 종료
             if (OPENWEATHER_API_KEY === 'YOUR_OPENWEATHERMAP_API_KEY' || !OPENWEATHER_API_KEY) {
-                document.getElementById('weatherInfo').textContent = 'API 키를 설정해주세요.';
+                document.getElementById('weatherInfo').innerHTML = '<span style="color: red;">API 키를 설정해주세요.</span>';
                 console.error('OpenWeatherMap API Key is not set. Please replace "YOUR_OPENWEATHERMAP_API_KEY" with your actual key.');
                 return;
             }
@@ -237,26 +241,35 @@
 
             try {
                 const response = await fetch(weatherUrl);
+                // 응답이 성공적인지 확인 (HTTP 상태 코드 200-299)
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('API 응답 오류:', response.status, errorData);
+                    document.getElementById('weatherInfo').innerHTML = `<span style="color: red;">날씨 오류: ${errorData.message || response.statusText}</span>`;
+                    return;
+                }
+
                 const data = await response.json();
 
-                if (data.main && data.weather) {
+                if (data.main && data.weather && data.name) { // 도시 이름도 확인
                     const temperature = Math.round(data.main.temp);
                     const description = data.weather[0].description;
                     const iconCode = data.weather[0].icon;
                     const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+                    const cityName = data.name;
 
                     const weatherInfoDiv = document.getElementById('weatherInfo');
                     weatherInfoDiv.innerHTML = `
                         <img src="${iconUrl}" alt="${description}" class="weather-icon">
-                        <span>${temperature}°C, ${description}</span>
+                        <span>${cityName}, ${temperature}°C, ${description}</span>
                     `;
                 } else {
-                    document.getElementById('weatherInfo').textContent = '날씨 정보 없음';
+                    document.getElementById('weatherInfo').innerHTML = '<span style="color: red;">날씨 정보가 불완전합니다.</span>';
                     console.warn('Weather data incomplete:', data);
                 }
             } catch (error) {
                 console.error('날씨 정보를 가져오는 데 실패했습니다:', error);
-                document.getElementById('weatherInfo').textContent = '날씨 정보를 가져올 수 없습니다.';
+                document.getElementById('weatherInfo').innerHTML = '<span style="color: red;">날씨 정보를 가져올 수 없습니다. (네트워크/API 오류)</span>';
             }
         }
 
