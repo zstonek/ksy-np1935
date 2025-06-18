@@ -8,23 +8,25 @@
     <style>
         /* 기본 (라이트 모드 또는 시스템 설정 없을 시) */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(200, 200, 200, 0.8);
+            --glass-bg: rgba(255, 255, 255, 0.4); /* 더 투명하게 */
+            --glass-border: rgba(255, 255, 255, 0.6); /* 더 밝고 선명한 경계선 */
             --text-color: #000000;
-            --button-bg: rgba(230, 230, 230, 0.8); /* 버튼 배경색 */
-            --button-border: rgba(180, 180, 180, 0.8); /* 버튼 테두리색 */
-            --button-active-bg: rgba(200, 200, 200, 1); /* 활성화된 버튼 배경색 */
+            --button-bg: rgba(230, 230, 230, 0.6);
+            --button-border: rgba(180, 180, 180, 0.8);
+            --button-active-bg: rgba(200, 200, 200, 0.8);
+            --glass-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 그림자 강화 */
         }
 
         /* 다크 모드 설정 시 */
         @media (prefers-color-scheme: dark) {
             :root {
-                --glass-bg: rgba(255, 255, 255, 0.08);
-                --glass-border: rgba(255, 255, 255, 0.15);
+                --glass-bg: rgba(255, 255, 255, 0.05); /* 더 투명하게 */
+                --glass-border: rgba(255, 255, 255, 0.1); /* 더 밝고 선명한 경계선 */
                 --text-color: #ffffff;
-                --button-bg: rgba(50, 50, 50, 0.8);
+                --button-bg: rgba(50, 50, 50, 0.6);
                 --button-border: rgba(80, 80, 80, 0.8);
-                --button-active-bg: rgba(70, 70, 70, 1);
+                --button-active-bg: rgba(70, 70, 70, 0.8);
+                --glass-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* 그림자 강화 */
             }
         }
 
@@ -38,28 +40,28 @@
             background: transparent;
             height: 100vh;
             display: flex;
-            align-items: center; /* 수직 가운데 정렬 */
-            justify-content: center; /* 수평 가운데 정렬 */
+            align-items: center;
+            justify-content: center;
             font-family: 'Montserrat', sans-serif;
             color: var(--text-color);
             padding: 15px;
-            flex-direction: column; /* 요소들을 세로로 정렬 */
-            gap: 15px; /* 요소 간 간격 */
+            flex-direction: column;
+            gap: 15px;
             transition: color 0.3s ease, background 0.3s ease;
         }
 
         /* 모든 유리 박스의 공통 스타일 */
         .glass-box {
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px); /* 블러 유지 */
             -webkit-backdrop-filter: blur(10px);
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--glass-shadow); /* 변수 사용 */
             font-weight: 700;
             color: var(--text-color);
             letter-spacing: 1px;
-            transition: background 0.3s ease, border 0.3s ease, color 0.3s ease, opacity 0.2s ease;
+            transition: background 0.3s ease, border 0.3s ease, color 0.3s ease, opacity 0.2s ease, box-shadow 0.3s ease;
             text-align: center;
             cursor: default;
             user-select: none;
@@ -67,75 +69,75 @@
         }
 
         .glass-box:hover {
-            opacity: 0.8;
+            opacity: 0.9; /* 호버 시 약간 덜 투명하게 */
         }
 
         /* 시계 스타일 */
         .glass-box.time-display {
-            font-size: 3.5rem;
+            font-size: 4rem; /* 글자 크기 더 키움 */
             font-weight: 900;
             padding: 20px 40px;
             letter-spacing: 2px;
-            min-width: 280px;
+            min-width: 320px; /* 최소 너비 조금 키움 */
             max-width: 90%;
         }
 
         /* 디데이 박스 스타일 */
         .glass-box.dday-display {
             font-size: 1.6rem;
-            padding: 12px 20px; /* 패딩을 약간 줄임 */
-            flex: 1; /* 남은 공간을 채우면서 유연하게 늘어남 */
-            min-width: 120px; /* 최소 너비 지정 (내용이 짤리지 않게) */
-            max-width: 180px; /* 최대 너비 지정 */
+            padding: 12px 20px;
+            flex: 1;
+            min-width: 130px; /* 최소 너비 조정 */
+            max-width: 200px; /* 최대 너비 조정 */
         }
 
         /* 디데이들을 위한 컨테이너 */
         .dday-container {
             display: flex;
-            flex-direction: row; /* 가로 나열 */
-            flex-wrap: wrap; /* 넘치면 줄바꿈 */
-            justify-content: space-evenly; /* 양 끝에 공간을 주고 균등하게 배치 */
-            align-items: center; /* 내부 요소 수직 가운데 정렬 */
-            gap: 10px; /* 내부 요소 간 간격 */
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 10px;
             width: 100%;
-            /* max-width 제거 - flexbox가 유동적으로 조절 */
+            max-width: 380px; /* 현재 시간 박스 너비를 넘지 않도록 제한 (min-width: 320px + gap 여유) */
         }
 
         /* 스톱워치/타이머 전체 컨테이너 */
         .stopwatch-timer-container {
             display: flex;
-            flex-direction: column; /* 기본은 세로 (버튼 위, 내용 아래) */
+            flex-direction: column;
             width: 100%;
-            max-width: 320px; /* 전체 컨테이너 최대 너비 감소 */
+            max-width: 320px; /* 이전과 동일 */
             align-items: center;
-            gap: 10px; /* 버튼과 내용 간 간격 감소 */
+            gap: 10px;
         }
 
         /* 탭 버튼 컨테이너 */
         .tab-buttons {
             display: flex;
             width: 90%;
-            max-width: 280px; /* 탭 버튼 컨테이너 최대 너비 감소 */
-            background: var(--glass-bg); /* 탭 버튼 배경도 유리 효과 */
+            max-width: 280px;
+            background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 10px; /* 모서리 둥글게 처리 감소 */
-            overflow: hidden; /* 버튼 모서리 둥글게 처리 */
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .tab-buttons button {
-            flex: 1; /* 버튼들이 공간을 균등하게 분배 */
-            padding: 8px 12px; /* 패딩 감소 */
-            background-color: transparent; /* 초기 배경 투명 */
+            flex: 1;
+            padding: 8px 12px;
+            background-color: transparent;
             border: none;
             color: var(--text-color);
-            font-size: 1rem; /* 폰트 크기 감소 */
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         .tab-buttons button.active {
-            background-color: var(--button-active-bg); /* 활성화된 탭 배경 */
+            background-color: var(--button-active-bg);
             color: var(--text-color);
             box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
         }
@@ -146,33 +148,33 @@
 
         /* 탭 콘텐츠 공통 스타일 */
         .tab-content {
-            display: none; /* 기본적으로 숨김 */
-            width: 95%; /* 너비 조절 */
-            max-width: 320px; /* 최대 너비 감소 */
-            min-height: 160px; /* 최소 높이 약간 감소 */
-            padding: 15px; /* 패딩 감소 */
+            display: none;
+            width: 95%;
+            max-width: 320px;
+            min-height: 160px;
+            padding: 15px;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            gap: 10px; /* 내부 요소 간 간격 감소 */
+            gap: 10px;
         }
 
         .tab-content.active {
-            display: flex; /* 활성화되면 보임 */
+            display: flex;
         }
 
         .tab-content .display {
-            font-size: 2.2rem; /* 폰트 크기 감소 */
+            font-size: 2.2rem;
             font-weight: 900;
             letter-spacing: 1px;
-            min-width: 180px; /* 최소 너비 감소 */
+            min-width: 180px;
             text-align: center;
         }
 
         .tab-content .controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px; /* 버튼 간 간격 감소 */
+            gap: 8px;
             justify-content: center;
             width: 100%;
         }
@@ -181,15 +183,15 @@
             background-color: var(--button-bg);
             border: 1px solid var(--button-border);
             border-radius: 8px;
-            padding: 7px 12px; /* 패딩 감소 */
-            font-size: 0.95rem; /* 폰트 크기 감소 */
+            padding: 7px 12px;
+            font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
             color: var(--text-color);
             transition: background-color 0.2s ease, transform 0.1s ease;
             flex-grow: 1;
-            min-width: 70px; /* 최소 너비 감소 */
-            max-width: 100px; /* 최대 너비 감소 */
+            min-width: 70px;
+            max-width: 100px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
@@ -206,19 +208,19 @@
         .timer-settings {
             display: flex;
             gap: 5px;
-            margin-bottom: 8px; /* 마진 감소 */
+            margin-bottom: 8px;
             justify-content: center;
             align-items: center;
             width: 100%;
         }
         .timer-settings input {
-            width: 50px; /* 입력 필드 너비 감소 */
-            padding: 4px; /* 패딩 감소 */
+            width: 50px;
+            padding: 4px;
             border: 1px solid var(--glass-border);
-            border-radius: 4px; /* 모서리 둥글게 감소 */
+            border-radius: 4px;
             background: var(--glass-bg);
             color: var(--text-color);
-            font-size: 1rem; /* 폰트 크기 감소 */
+            font-size: 1rem;
             text-align: center;
             -moz-appearance: textfield;
         }
@@ -228,7 +230,7 @@
             margin: 0;
         }
         .timer-settings span {
-            font-size: 1.1rem; /* 폰트 크기 감소 */
+            font-size: 1.1rem;
             font-weight: 700;
         }
 
@@ -238,21 +240,22 @@
                 gap: 20px;
             }
             .glass-box.time-display {
-                font-size: 4rem;
+                font-size: 4.5rem; /* 데스크톱에서 더 크게 */
                 padding: 25px 50px;
+                min-width: 360px; /* 데스크톱 최소 너비 더 키움 */
             }
             .dday-container {
                 gap: 20px;
-                /* max-width 제거 - 유동적으로 */
+                max-width: 400px; /* 데스크톱에서 디데이 컨테이너 최대 너비를 시계에 맞춰 조절 */
             }
             .glass-box.dday-display {
                 font-size: 1.8rem;
                 padding: 15px 30px;
-                min-width: 150px; /* 데스크톱에서 디데이 최소 너비 */
-                max-width: 220px; /* 데스크톱에서 디데이 최대 너비 */
+                min-width: 160px;
+                max-width: 220px;
             }
             .stopwatch-timer-container {
-                max-width: 360px; /* 데스크톱에서 스톱워치/타이머 컨테이너 너비 조금 늘림 */
+                max-width: 360px;
             }
             .tab-buttons {
                 max-width: 320px;
@@ -263,7 +266,7 @@
             }
             .tab-content {
                 max-width: 360px;
-                min-height: 180px; /* 높이 약간 늘림 */
+                min-height: 180px;
                 padding: 20px;
             }
             .tab-content .display {
@@ -289,28 +292,30 @@
                 padding: 10px;
             }
             .glass-box.time-display {
-                font-size: 2.5rem;
+                font-size: 3rem; /* 모바일에서 글자 크기 조정 */
                 padding: 15px 30px;
+                min-width: 250px; /* 모바일 최소 너비 조정 */
             }
             .dday-container {
-                flex-direction: row; /* 모바일에서도 가로 나열 유지 */
-                flex-wrap: wrap; /* 공간이 부족하면 줄바꿈 */
-                justify-content: space-evenly; /* 모바일에서도 균등 배치 */
-                gap: 8px; /* 모바일에서 간격 감소 */
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-evenly;
+                gap: 8px;
                 width: 100%;
+                max-width: 280px; /* 모바일에서 디데이 컨테이너 최대 너비를 시계에 맞춰 조절 */
             }
             .glass-box.dday-display {
                 font-size: 1.3rem;
                 padding: 10px 15px;
-                min-width: 100px; /* 모바일에서 최소 너비 더 줄임 */
-                max-width: 48%; /* 2개씩 한 줄에 들어가도록 최대 너비 조정 */
+                min-width: 100px;
+                max-width: 48%;
             }
             .stopwatch-timer-container {
                 gap: 8px;
             }
             .tab-buttons {
                 width: 100%;
-                max-width: 250px; /* 모바일에서 탭 버튼 최대 너비 감소 */
+                max-width: 250px;
             }
             .tab-buttons button {
                 padding: 7px 10px;
@@ -318,8 +323,8 @@
             }
             .tab-content {
                 width: 100%;
-                max-width: 280px; /* 모바일에서 탭 콘텐츠 최대 너비 감소 */
-                min-height: 140px; /* 모바일에서 최소 높이 더 감소 */
+                max-width: 280px;
+                min-height: 140px;
                 padding: 12px;
             }
             .tab-content .display {
